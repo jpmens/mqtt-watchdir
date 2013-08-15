@@ -40,7 +40,7 @@ watch/myname (null)
 
 ## Related utilities
 
-* Roger Light (of Mosquitto fame) created [mqttfs], a FUSE driver which works similarly.
+* Roger Light (of Mosquitto fame) created [mqttfs], a FUSE driver (in C) which works similarly.
 * Roger Light (yes, the same busy gentleman) also made [treewatch], a program to watch a set of directories and execute a program when there is a change in the files within the directories.
 
  [mqttfs]: https://bitbucket.org/oojah/mqttfs
