@@ -5,7 +5,7 @@ of newly created and modified files as payload to an [MQTT] broker. Files which
 are deleted are published with a NULL payload.
 
 The path to the directory to watch recursively (default `.`), as well as a list of files
-to ignore (`*.swp`, `*.o`), the broker host (`localhost`)  and port number (`1883`)
+to ignore (`*.swp`, `*.o`, `*.pyc`), the broker host (`localhost`)  and port number (`1883`)
 must be specified in the program, together with the topic prefix to which to publish to
 (`watch/`).
 

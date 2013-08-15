@@ -39,7 +39,7 @@ MQTT_BROKERHOST = 'localhost'
 MQTT_BROKERPORT = 1883
 WATCH_DIRECTORY = '.'
 TOPIC_PREFIX    = 'watch'
-ignore_patterns = [ '*.swp', '*.o' ]
+ignore_patterns = [ '*.swp', '*.o', '*.pyc' ]
 
 retain=False
 
