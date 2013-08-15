@@ -27,6 +27,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+__author__ = "Jan-Piet Mens"
+__copyright__ = "Copyright (C) 2013 by Jan-Piet Mens"
+
 import os, sys
 import signal
 import time
@@ -41,7 +44,11 @@ WATCH_DIRECTORY = '.'
 TOPIC_PREFIX    = 'watch'
 ignore_patterns = [ '*.swp', '*.o', '*.pyc' ]
 
+# Publish with retain (True or False)
 retain=False
+
+# Quality of Service (0 .. 2)
+QOS=0
 
 
 # Ensure absolute path (incl. symlink expansion)
@@ -79,7 +86,7 @@ class MyHandler(PatternMatchingEventHandler):
 
         path = event.src_path
 
-        # Create relative path name
+        # Create relative path name and append to topic prefix
         filename = path.replace(DIR + '/', '')
 
         topic = '%s/%s' % (TOPIC_PREFIX, filename)
@@ -96,7 +103,7 @@ class MyHandler(PatternMatchingEventHandler):
                 print "Can't open file %s: %s" % (path, e)
                 return
 
-        mqttc.publish(topic, payload, qos=0, retain=retain)
+        mqttc.publish(topic, payload, qos=QOS, retain=retain)
 
     def on_created(self, event):
         self.catch_all(event, 'NEW')
