@@ -41,6 +41,9 @@ WATCH_DIRECTORY = '.'
 TOPIC_PREFIX    = 'watch'
 ignore_patterns = [ '*.swp', '*.o' ]
 
+retain=False
+
+
 # Ensure absolute path (incl. symlink expansion)
 DIR = os.path.abspath(os.path.dirname(os.path.expanduser(WATCH_DIRECTORY)))
 
@@ -93,7 +96,7 @@ class MyHandler(PatternMatchingEventHandler):
                 print "Can't open file %s: %s" % (path, e)
                 return
 
-        mqttc.publish(topic, payload, 0)
+        mqttc.publish(topic, payload, qos=0, retain=retain)
 
     def on_created(self, event):
         self.catch_all(event, 'NEW')
