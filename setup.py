@@ -10,6 +10,9 @@ setup(
     name='mqtt-watchdir',
     url="https://github.com/jpmens/mqtt-watchdir",
     long_description=__doc__,
+    scripts=[
+        "mqtt-watchdir.py"
+    ],
     install_requires=[
         'watchdog',
         'mosquitto',
