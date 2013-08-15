@@ -13,9 +13,9 @@ must be specified in the program, together with the topic prefix to which to pub
 
 ```
 git clone https://github.com/jpmens/mqtt-watchdir.git
+cd mqtt-watchdir
 virtualenv watchdir
 source watchdir/bin/activate
-cd mqtt-watchdir
 pip install -e .
 ```
 
