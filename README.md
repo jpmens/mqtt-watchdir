@@ -9,6 +9,15 @@ to ignore (`*.swp`, `*.o`), the broker host (`localhost`)  and port number (`188
 must be specified in the program, together with the topic prefix to which to publish to
 (`watch/`).
 
+## Installation
+
+```
+git clone https://github.com/jpmens/mqtt-watchdir.git
+virtualenv watchdir
+source watchdir/bin/activate
+pip install -e .
+```
+
 ## Testing
 
 Launch `mosquitto_sub`:
