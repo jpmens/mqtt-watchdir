@@ -88,7 +88,7 @@ def get_git_version(abbrev=7):
     # First try to get the current version using “git describe”.
 
     version = call_git_describe(abbrev)
-    if version is not None and is_dirty():
+    if version is not None and is_dirty():  # JPM
         version += "-dirty"
 
     # If that doesn't work, fall back on the value that's in
