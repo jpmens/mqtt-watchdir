@@ -38,6 +38,7 @@ import mosquitto
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
 import platform
+import imp
 
 MQTTHOST        = os.getenv('MQTTHOST', 'localhost')
 MQTTPORT        = int(os.getenv('MQTTPORT', 1883))
@@ -47,6 +48,7 @@ MQTTRETAIN      = int(os.getenv('MQTTRETAIN', 0))
 
 # May be None in which case neither prefix no separating slash are prepended
 MQTTPREFIX      = os.getenv('MQTTPREFIX', 'watch')
+MQTTFILTER      = os.getenv('MQTTFILTER', None)
 
 WATCHDEBUG      = os.getenv('WATCHDEBUG', 0)
 
@@ -65,6 +67,13 @@ else:
 DIR = os.path.abspath(os.path.expanduser(MQTTWATCHDIR))
 
 OS = platform.system()
+
+mf = None
+if MQTTFILTER is not None:
+    try:
+        mf = imp.load_source('mfilter', MQTTFILTER)
+    except Exception, e:
+        sys.exit("Can't import filter from file %s: %s" % (MQTTFILTER, e))
 
 mqttc = mosquitto.Mosquitto()
 
@@ -129,6 +138,21 @@ class MyHandler(PatternMatchingEventHandler):
             except Exception, e:
                 print "Can't open file %s: %s" % (path, e)
                 return
+
+        # If we've loaded a filter, run data through the filter to obtain
+        # a (possibly) modified payload
+
+        if mf is not None:
+            try:
+                publish, new_payload = mf.mfilter(path, topic, payload)
+                if publish is False:
+                    if WATCHDEBUG:
+                        print "NOT publishing %s" % path
+                    return
+                if new_payload is not None:
+                    payload = new_payload
+            except Exception, e:
+                print "mfilter: %s" % (e)
 
         mqttc.publish(topic, payload, qos=MQTTQOS, retain=MQTTRETAIN)
 

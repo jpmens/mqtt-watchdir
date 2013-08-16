@@ -28,6 +28,7 @@ Set the following optional environment variables before invoking _mqtt-watchdir.
 * `MQTTQOS` (default: `0`) is the MQTT Quality of Service (QoS) to use on publish. Allowed values are `0`, `1`, or `2`.
 * `MQTTRETAIN` (default: `0`) specifies whether the "retain" flag should be set on publish. Set to `1` if you want messages to be retained.
 * `MQTTPREFIX` (default: `"watch"`) is the prefix to be prepended (with a slash) to the MQTT topic name. The topic name is formed from this prefix plus the path name of the file that is being modified (i.e. watched). You can set this to an empty string (`""`) to avoid prefixing the topic name.
+* `MQTTFILTER` (default None) allows modifying payload (see below). Takes path to a Python file (e.g. `"/path/to/example-filter.py"`.
 
 * Set `WATCHDEBUG` (default: `0`) to `1` to show debugging information.
 
@@ -55,6 +56,48 @@ watch/myname JP
 watch/myname (null)
 ```
 
+## Filters
+
+Without a filter (the default), _mqtt-watchdir_ reads the content of a newly created
+or modified file and uses that as the MQTT payload. By creating and enabling a
+so-called _filter_, _mqtt-watchdir_ can pass the payload into said filter (a Python
+function) to have a payload translated.
+
+Consider the included `example-filter.py`:
+
+```python
+def mfilter(filename, topic, payload):
+    '''Return a tuple [pub, newpayload] indicating whether this event
+       should be published (True or False) and a new payload string
+       or None'''
+
+    print "Filter for topic %s" % topic
+
+    if filename.endswith('.jpg'):
+        return False, None
+
+    if payload is not None:
+        return True, payload.replace("\n", "-").replace(" ", "+")
+    return True, None
+```
+
+The _mfilter_ function is passed the fully qualified path to the file, the
+(possibly prefixed) MQTT topic name and the payload. In this simple example,
+spaces and newlines in the payload are replaced by dashes and plusses.
+
+The function must return a tuple with two elements:
+
+1. The first specifies whether the payload will be published (True) or not (False)
+2. The second is a string with a possibly modified payload or None. If the returned
+   payload is _None_, the original payload is not modified.
+
+Possible uses of filters include
+
+* Limiting payload lengths
+* Conversion to JSON
+* Ignore certain file types (e.g. binary data)
+* Process content of files, say, YAML or JSON, and extract elements returning as string
+
 ## Requirements
 
 * [watchdog](https://github.com/gorakhargosh/watchdog), a Python library to monitor file-system events.
@@ -64,7 +107,7 @@ watch/myname (null)
 
 * Roger Light (of [Mosquitto] fame) created [mqttfs], a FUSE driver (in C) which works similarly.
 * Roger Light (yes, the same busy gentleman) also made [treewatch], a program to watch a set of directories and execute a program when there is a change in the files within the directories.
-* Thanks to Karl Palsson for `setup.py`.
+* Thanks to Karl Palsson for the `setup.py` and `version.py` magic.
 
  [mqttfs]: https://bitbucket.org/oojah/mqttfs
  [treewatch]: https://bitbucket.org/oojah/treewatch
