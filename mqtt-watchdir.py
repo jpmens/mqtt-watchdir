@@ -107,14 +107,17 @@ class MyHandler(PatternMatchingEventHandler):
 
         path = event.src_path
 
-        if OS == 'Linux':
+        if OS == 'Linux' and op != 'DEL':
 
-            # On Linux, a new file is NEW and MOD. Ensure we publish once only
-            ctime = os.path.getctime(path)
-            mtime = os.path.getmtime(path)
+            try:
+                # On Linux, a new file is NEW and MOD. Ensure we publish once only
+                ctime = os.path.getctime(path)
+                mtime = os.path.getmtime(path)
 
-            if op == 'NEW' and mtime == ctime:
-                    return
+                if op == 'NEW' and mtime == ctime:
+                        return
+            except:
+                pass
 
         # Create relative path name and append to topic prefix
         filename = path.replace(DIR + '/', '')
