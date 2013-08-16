@@ -41,7 +41,11 @@ from watchdog.observers import Observer
 MQTT_BROKERHOST = 'localhost'
 MQTT_BROKERPORT = 1883
 WATCH_DIRECTORY = '.'
+
+# May be None in which case neither prefix no separating slash are prepended
 TOPIC_PREFIX    = 'watch'
+# TOPIC_PREFIX    = None
+
 ignore_patterns = [ '*.swp', '*.o', '*.pyc' ]
 
 # Publish with retain (True or False)
@@ -89,7 +93,10 @@ class MyHandler(PatternMatchingEventHandler):
         # Create relative path name and append to topic prefix
         filename = path.replace(DIR + '/', '')
 
-        topic = '%s/%s' % (TOPIC_PREFIX, filename)
+        if TOPIC_PREFIX is not None:
+            topic = '%s/%s' % (TOPIC_PREFIX, filename)
+        else:
+            topic = filename
 
         if op == 'DEL':
             payload = None
