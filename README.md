@@ -6,8 +6,7 @@ are deleted are published with a NULL payload.
 
 The path to the directory to watch recursively (default `.`), as well as a list of files
 to ignore (`*.swp`, `*.o`, `*.pyc`), the broker host (`localhost`)  and port number (`1883`)
-must be specified in the program, together with the topic prefix to which to publish to
-(`watch/`).
+must be specified in via environment variables , together with the topic prefix to which to publish to (`watch/`).
 
 ## Installation
 
@@ -21,8 +20,16 @@ pip install -e .
 
 ## Configuration
 
-* `TOPIC_PREFIX` is prepended onto the relative path of the file being accessed, and
-  may be None.
+Set the following optional environment variables before invoking _mqtt-watchdir.py_:
+
+* `MQTTHOST` (default `"localhost"`) is the name/address of the MQTT broker.
+* `MQTTPORT` (default `1883`) is the TCP port number of the broker.
+* `MQTTWATCHDIR` (default: `"."`) is the path to the directory to watch.
+* `MQTTQOS` (default: `0`) is the MQTT Quality of Service (QoS) to use on publish. Allowed values are `0`, `1`, or `2`.
+* `MQTTRETAIN` (default: `0`) specifies whether the "retain" flag should be set on publish. Set to `1` if you want messages to be retained.
+* `MQTTPREFIX` (default: `"watch"`) is the prefix to be prepended (with a slash) to the MQTT topic name. The topic name is formed from this prefix plus the path name of the file that is being modified (i.e. watched). You can set this to an empty string (`""`) to avoid prefixing the topic name.
+
+* Set `WATCHDEBUG` (default: `0`) to `1` to show debugging information.
 
 ## Testing
 
