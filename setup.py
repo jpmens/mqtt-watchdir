@@ -6,14 +6,18 @@ try:
 except ImportError:
     pass
 
+with open('readme.rst') as file:
+    long_description = file.read()
+
 setup(
     name='mqtt-watchdir',
-    version='1.2',
+    version='1.3',
     author='Jan-Piet Mens',
     author_email='jpmens@gmail.com',
     url="https://github.com/jpmens/mqtt-watchdir",
     description='Recursively watch a directory for modifications and publish file content to an MQTT broker',
     license='BSD License',
+    long_description=long_description,
     scripts=[
         "mqtt-watchdir.py"
     ],

@@ -19,6 +19,11 @@ source watchdir/bin/activate
 pip install -e .
 ```
 
+## Configuration
+
+* `TOPIC_PREFIX` is prepended onto the relative path of the file being accessed, and
+  may be None.
+
 ## Testing
 
 Launch `mosquitto_sub`:
@@ -27,7 +32,7 @@ Launch `mosquitto_sub`:
 mosquitto_sub -v -t 'watch/#'
 ```
 
-Launch this program and, in another terminal, try somthing like this:
+Launch this program and, in another terminal, try something like this:
 
 ```bash
 echo Hello World > message
@@ -45,12 +50,12 @@ watch/myname (null)
 
 ## Requirements
 
-* [watchdog](https://github.com/gorakhargosh/watchdog), a Python library to monitor filesystem events.
+* [watchdog](https://github.com/gorakhargosh/watchdog), a Python library to monitor file-system events.
 * [Mosquitto]'s Python module
 
 ## Related utilities & Credits
 
-* Roger Light (of Mosquitto fame) created [mqttfs], a FUSE driver (in C) which works similarly.
+* Roger Light (of [Mosquitto] fame) created [mqttfs], a FUSE driver (in C) which works similarly.
 * Roger Light (yes, the same busy gentleman) also made [treewatch], a program to watch a set of directories and execute a program when there is a change in the files within the directories.
 * Thanks to Karl Palsson for `setup.py`.
 
