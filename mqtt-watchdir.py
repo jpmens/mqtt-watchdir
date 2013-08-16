@@ -37,26 +37,34 @@ import mosquitto
 # https://github.com/gorakhargosh/watchdog
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
+import platform
 
-MQTT_BROKERHOST = 'localhost'
-MQTT_BROKERPORT = 1883
-WATCH_DIRECTORY = '.'
+MQTTHOST        = os.getenv('MQTTHOST', 'localhost')
+MQTTPORT        = int(os.getenv('MQTTPORT', 1883))
+MQTTWATCHDIR    = os.getenv('MQTTWATCHDIR', '.')
+MQTTQOS         = int(os.getenv('MQTTQOS', 0))
+MQTTRETAIN      = int(os.getenv('MQTTRETAIN', 0))
 
 # May be None in which case neither prefix no separating slash are prepended
-TOPIC_PREFIX    = 'watch'
-# TOPIC_PREFIX    = None
+MQTTPREFIX      = os.getenv('MQTTPREFIX', 'watch')
+
+WATCHDEBUG      = os.getenv('WATCHDEBUG', 0)
+
+if MQTTPREFIX == '':
+    MQTTPREFIX = None
 
 ignore_patterns = [ '*.swp', '*.o', '*.pyc' ]
 
 # Publish with retain (True or False)
-retain=False
-
-# Quality of Service (0 .. 2)
-QOS=0
-
+if MQTTRETAIN == 1:
+    MQTTRETAIN=True
+else:
+    MQTTRETAIN=False
 
 # Ensure absolute path (incl. symlink expansion)
-DIR = os.path.abspath(os.path.dirname(os.path.expanduser(WATCH_DIRECTORY)))
+DIR = os.path.abspath(os.path.expanduser(MQTTWATCHDIR))
+
+OS = platform.system()
 
 mqttc = mosquitto.Mosquitto()
 
@@ -90,11 +98,23 @@ class MyHandler(PatternMatchingEventHandler):
 
         path = event.src_path
 
+        if OS == 'Linux':
+
+            # On Linux, a new file is NEW and MOD. Ensure we publish once only
+            ctime = os.path.getctime(path)
+            mtime = os.path.getmtime(path)
+
+            if op == 'NEW' and mtime == ctime:
+                    return
+
         # Create relative path name and append to topic prefix
         filename = path.replace(DIR + '/', '')
 
-        if TOPIC_PREFIX is not None:
-            topic = '%s/%s' % (TOPIC_PREFIX, filename)
+        if WATCHDEBUG:
+            print "%s %s" % (op, filename)
+
+        if MQTTPREFIX is not None:
+            topic = '%s/%s' % (MQTTPREFIX, filename)
         else:
             topic = filename
 
@@ -110,7 +130,7 @@ class MyHandler(PatternMatchingEventHandler):
                 print "Can't open file %s: %s" % (path, e)
                 return
 
-        mqttc.publish(topic, payload, qos=QOS, retain=retain)
+        mqttc.publish(topic, payload, qos=MQTTQOS, retain=MQTTRETAIN)
 
     def on_created(self, event):
         self.catch_all(event, 'NEW')
@@ -126,7 +146,7 @@ def main():
     mqttc.on_disconnect = on_disconnect
     mqttc.on_publish = on_publish
 
-    mqttc.connect(MQTT_BROKERHOST, MQTT_BROKERPORT)
+    mqttc.connect(MQTTHOST, MQTTPORT)
 
     mqttc.loop_start()
 
