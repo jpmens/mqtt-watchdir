@@ -43,6 +43,9 @@ Set the following optional environment variables before invoking
    prefixing the topic name.
 -  ``MQTTFILTER`` (default None) allows modifying payload (see below).
    Takes path to a Python file (e.g. ``"/path/to/example-filter.py"``.
+-  ``MQTTFIXEDTOPIC`` (default None) sets a MQTT topic to which
+  ALL messages are published. If set, the ``MQTTPREFIX`` setting is
+  overruled and ignored.
 
 -  Set ``WATCHDEBUG`` (default: ``0``) to ``1`` to show debugging
    information.

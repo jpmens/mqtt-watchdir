@@ -50,10 +50,21 @@ MQTTRETAIN      = int(os.getenv('MQTTRETAIN', 0))
 MQTTPREFIX      = os.getenv('MQTTPREFIX', 'watch')
 MQTTFILTER      = os.getenv('MQTTFILTER', None)
 
+# Publish all messages to a fixed topic. E.g. if the file contents already/also 
+# contains the name of the file or in certain situations with retained messages.
+# Overrules and ignores the MQTTPREFIX setting.
+MQTTFIXEDTOPIC  = os.getenv('MQTTFIXEDTOPIC', None)
+
 WATCHDEBUG      = os.getenv('WATCHDEBUG', 0)
 
 if MQTTPREFIX == '':
     MQTTPREFIX = None
+
+if MQTTFIXEDTOPIC == '':
+    MQTTFIXEDTOPIC = None
+
+if MQTTFIXEDTOPIC:
+    print 'Publishing ALL messages to the topic: %s' % MQTTFIXEDTOPIC
 
 ignore_patterns = [ '*.swp', '*.o', '*.pyc' ]
 
@@ -122,13 +133,16 @@ class MyHandler(PatternMatchingEventHandler):
         # Create relative path name and append to topic prefix
         filename = path.replace(DIR + '/', '')
 
-        if WATCHDEBUG:
-            print "%s %s" % (op, filename)
-
-        if MQTTPREFIX is not None:
-            topic = '%s/%s' % (MQTTPREFIX, filename)
+        if MQTTFIXEDTOPIC is not None:
+            topic = MQTTFIXEDTOPIC
         else:
-            topic = filename
+            if MQTTPREFIX is not None:
+                topic = '%s/%s' % (MQTTPREFIX, filename)
+            else:
+                topic = filename
+
+        if WATCHDEBUG:
+            print "%s %s. Topic: %s" % (op, filename, topic)
 
         if op == 'DEL':
             payload = None
