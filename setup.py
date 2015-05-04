@@ -36,7 +36,7 @@ setup(
     ],
     install_requires=[
         'watchdog',
-        'mosquitto',
+        'paho-mqtt',
     ],
     classifiers=[
         'Development Status :: 4 - Beta',

@@ -127,7 +127,7 @@ Requirements
 
 -  `watchdog <https://github.com/gorakhargosh/watchdog>`_, a Python
    library to monitor file-system events.
--  `Mosquitto <http://mosquitto.org>`_'s Python module
+-  `Paho-MQTT <https://pypi.python.org/pypi/paho-mqtt>`_'s Python module
 
 Related utilities & Credits
 ---------------------------

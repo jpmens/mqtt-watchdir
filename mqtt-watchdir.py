@@ -28,12 +28,12 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 __author__ = "Jan-Piet Mens"
-__copyright__ = "Copyright (C) 2013 by Jan-Piet Mens"
+__copyright__ = "Copyright (C) 2013-2015 by Jan-Piet Mens"
 
 import os, sys
 import signal
 import time
-import mosquitto
+import paho.mqtt.client as paho
 # https://github.com/gorakhargosh/watchdog
 from watchdog.events import PatternMatchingEventHandler
 from watchdog.observers import Observer
@@ -86,21 +86,22 @@ if MQTTFILTER is not None:
     except Exception, e:
         sys.exit("Can't import filter from file %s: %s" % (MQTTFILTER, e))
 
-mqttc = mosquitto.Mosquitto()
+clientid = 'mqtt-watchdir-%s' % os.getpid()
+mqtt = paho.Client(clientid, clean_session=True)
 
 def on_publish(mosq, userdata, mid):
     pass
     # print("mid: "+str(mid))
 
 def on_disconnect(mosq, userdata, rc):
-    print "OOOOPS! disconnect"
+    print "disconnected"
     time.sleep(5)
 
 def signal_handler(signal, frame):
     """ Bail out at the top level """
 
-    mqttc.loop_stop()
-    mqttc.disconnect()
+    mqtt.loop_stop()
+    mqtt.disconnect()
 
     sys.exit(0)
 
@@ -171,7 +172,7 @@ class MyHandler(PatternMatchingEventHandler):
             except Exception, e:
                 print "mfilter: %s" % (e)
 
-        mqttc.publish(topic, payload, qos=MQTTQOS, retain=MQTTRETAIN)
+        mqtt.publish(topic, payload, qos=MQTTQOS, retain=MQTTRETAIN)
 
     def on_created(self, event):
         self.catch_all(event, 'NEW')
@@ -184,12 +185,12 @@ class MyHandler(PatternMatchingEventHandler):
 
 def main():
 
-    mqttc.on_disconnect = on_disconnect
-    mqttc.on_publish = on_publish
+    mqtt.on_disconnect = on_disconnect
+    mqtt.on_publish = on_publish
 
-    mqttc.connect(MQTTHOST, MQTTPORT)
+    mqtt.connect(MQTTHOST, MQTTPORT)
 
-    mqttc.loop_start()
+    mqtt.loop_start()
 
     signal.signal(signal.SIGINT, signal_handler)
     while 1:
