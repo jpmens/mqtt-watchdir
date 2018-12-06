@@ -31,6 +31,8 @@ Set the following optional environment variables before invoking
 
 -  ``MQTTHOST`` (default ``"localhost"``) is the name/address of the MQTT broker.
 -  ``MQTTPORT`` (default ``1883``) is the TCP port number of the broker.
+-  ``MQTTUSERNAME`` is the username to connect to the broker.
+-  ``MQTTPASSWORD`` is the password to connect to the broker.
 -  ``MQTTWATCHDIR`` (default: ``"."``) is the path to the directory to watch.
 -  ``MQTTQOS`` (default: ``0``) is the MQTT Quality of Service (QoS) to
    use on publish. Allowed values are ``0``, ``1``, or ``2``.
