@@ -42,6 +42,8 @@ import imp
 
 MQTTHOST        = os.getenv('MQTTHOST', 'localhost')
 MQTTPORT        = int(os.getenv('MQTTPORT', 1883))
+MQTTUSERNAME    = os.getenv('MQTTUSERNAME', None)
+MQTTPASSWORD    = os.getenv('MQTTPASSWORD', None)
 MQTTWATCHDIR    = os.getenv('MQTTWATCHDIR', '.')
 MQTTQOS         = int(os.getenv('MQTTQOS', 0))
 MQTTRETAIN      = int(os.getenv('MQTTRETAIN', 0))
@@ -88,6 +90,8 @@ if MQTTFILTER is not None:
 
 clientid = 'mqtt-watchdir-%s' % os.getpid()
 mqtt = paho.Client(clientid, clean_session=True)
+if MQTTUSERNAME is not None or MQTTPASSWORD is not None:
+    mqtt.username_pw_set(MQTTUSERNAME, MQTTPASSWORD)
 
 def on_publish(mosq, userdata, mid):
     pass
